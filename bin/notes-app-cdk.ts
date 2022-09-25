@@ -2,9 +2,10 @@
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
 import { NotesAppCdkStack } from '../lib/notes-app-cdk-stack';
+import { Tags } from 'aws-cdk-lib';
 
 const app = new cdk.App();
-new NotesAppCdkStack(app, 'NotesAppCdkStack', {
+const stack = new NotesAppCdkStack(app, 'NotesAppCdkStack', {
   /* If you don't specify 'env', this stack will be environment-agnostic.
    * Account/Region-dependent features and context lookups will not work,
    * but a single synthesized template can be deployed anywhere. */
@@ -19,3 +20,6 @@ new NotesAppCdkStack(app, 'NotesAppCdkStack', {
 
   /* For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html */
 });
+
+Tags.of(stack).add('DeveloperName', 'Carlos Ramirez Vera');
+Tags.of(stack).add('DeveloperEmail', 'carlosrv125@icloud.com');

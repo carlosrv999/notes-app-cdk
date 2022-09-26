@@ -1,0 +1,3 @@
+-- Your SQL scripts for initialization goes here...
+
+SELECT NOW();

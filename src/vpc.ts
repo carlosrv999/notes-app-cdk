@@ -18,8 +18,8 @@ export class VpcNetwork extends Construct {
       enableDnsSupport: true,
       subnetConfiguration: [{
         name: 'SubnetPrivate-1',
-        subnetType: SubnetType.PRIVATE_ISOLATED,
-        cidrMask: 25
+        subnetType: SubnetType.PRIVATE_WITH_EGRESS,
+        cidrMask: 25,
       },{
         name: 'SubnetPublic-2',
         subnetType: SubnetType.PUBLIC,

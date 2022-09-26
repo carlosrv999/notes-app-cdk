@@ -1,6 +1,10 @@
+import { CfnOutput, Duration, Token } from "aws-cdk-lib";
 import { IInstance, InstanceClass, InstanceSize, InstanceType, IVpc, Port, SubnetType } from "aws-cdk-lib/aws-ec2";
+import { DockerImageCode } from "aws-cdk-lib/aws-lambda";
+import { RetentionDays } from "aws-cdk-lib/aws-logs";
 import { Credentials, DatabaseInstance, DatabaseInstanceEngine, DatabaseSecret, IDatabaseInstance, PostgresEngineVersion } from "aws-cdk-lib/aws-rds";
 import { Construct } from "constructs";
+import { CdkResourceInitializer } from './resource-initializer'
 
 export interface IDatabaseInstanceProps {
   readonly vpc: IVpc,
@@ -31,13 +35,40 @@ export class Database extends Construct {
       allocatedStorage: 20,
       vpcSubnets: {
         onePerAz: true,
-        subnetType: SubnetType.PRIVATE_ISOLATED
+        subnetType: SubnetType.PRIVATE_WITH_EGRESS
       },
       credentials: Credentials.fromSecret(creds),
       instanceType: InstanceType.of(InstanceClass.M6I, InstanceSize.LARGE)
     })
 
     this.databaseInstance.connections.allowFrom(props.ec2, Port.tcp(5432));
+
+    const initializer = new CdkResourceInitializer(this, 'MyRdsInit', {
+      config: {
+        credsSecretName
+      },
+      fnLogRetention: RetentionDays.FIVE_MONTHS,
+      fnCode: DockerImageCode.fromImageAsset(`${__dirname}/lambda`, {}),
+      fnTimeout: Duration.minutes(2),
+      fnSecurityGroups: [],
+      vpc: props.vpc,
+      subnetsSelection: props.vpc.selectSubnets({
+        subnetType: SubnetType.PRIVATE_WITH_EGRESS
+      })
+    })
+    // manage resources dependency
+    initializer.customResource.node.addDependency(this.databaseInstance)
+
+    // allow the initializer function to connect to the RDS instance
+    this.databaseInstance.connections.allowFrom(initializer.function, Port.tcp(5432))
+
+    // allow initializer function to read RDS instance creds secret
+    creds.grantRead(initializer.function)
+
+    /* eslint no-new: 0 */
+    new CfnOutput(this, 'RdsInitFnResponse', {
+      value: Token.asString(initializer.response)
+    })
 
   }
 }

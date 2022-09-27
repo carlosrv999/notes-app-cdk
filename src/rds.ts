@@ -8,7 +8,6 @@ import { CdkResourceInitializer } from './resource-initializer'
 
 export interface IDatabaseInstanceProps {
   readonly vpc: IVpc,
-  readonly ec2: IInstance,
 }
 
 export class Database extends Construct {
@@ -22,7 +21,7 @@ export class Database extends Construct {
     const credsSecretName = `/${id}/rds/creds/${instanceIdentifier}`.toLowerCase()
     const creds = new DatabaseSecret(this, 'PostgreSQLCredentials', {
       secretName: credsSecretName,
-      username: 'carlosrv'
+      username: 'notes_user'
     })
 
     this.vpc = props.vpc;
@@ -33,6 +32,7 @@ export class Database extends Construct {
       }),
       instanceIdentifier,
       allocatedStorage: 20,
+      databaseName: 'notesapp',
       vpcSubnets: {
         onePerAz: true,
         subnetType: SubnetType.PRIVATE_WITH_EGRESS
@@ -40,8 +40,6 @@ export class Database extends Construct {
       credentials: Credentials.fromSecret(creds),
       instanceType: InstanceType.of(InstanceClass.M6I, InstanceSize.LARGE)
     })
-
-    this.databaseInstance.connections.allowFrom(props.ec2, Port.tcp(5432));
 
     const initializer = new CdkResourceInitializer(this, 'MyRdsInit', {
       config: {

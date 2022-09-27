@@ -14,7 +14,7 @@ exports.handler = async (e, context) => {
     const connection = new Client({
       user: username,
       host: host,
-      database: 'postgres',
+      database: 'notesapp',
       password: password,
       port: 5432,
     })

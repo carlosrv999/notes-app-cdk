@@ -3,6 +3,8 @@
 *.d.ts
 node_modules
 !src/lambda/*.js
+!notesapp/*
+notesapp/node_modules
 
 # CDK asset staging directory
 .cdk.staging

@@ -18,7 +18,7 @@ export type BuildConfig = {
 
 // This function is used by your CDK app and pulls your config values
 // from the context
-export const getConfig = (app: IConstruct): BuildConfig => {
+export const getConfig = (app: cdk.App): BuildConfig => {
   const env = app.node.tryGetContext("config");
   if (!env) {
     throw new Error(

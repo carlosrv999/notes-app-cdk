@@ -3,8 +3,11 @@ import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
 import { NotesAppCdkStack } from '../lib/notes-app-cdk-stack';
 import { Tags } from 'aws-cdk-lib';
+import { getConfig } from '../build-config';
 
 const app = new cdk.App();
+const config = getConfig(app);
+console.log(config);
 const stack = new NotesAppCdkStack(app, 'NotesAppCdkStack', {
   /* If you don't specify 'env', this stack will be environment-agnostic.
    * Account/Region-dependent features and context lookups will not work,

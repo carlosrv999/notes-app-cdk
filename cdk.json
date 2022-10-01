@@ -37,6 +37,10 @@
     "@aws-cdk/core:target-partitions": [
       "aws",
       "aws-cn"
-    ]
+    ],
+    "prod": {
+      "region": "us-east-2",
+      "appPrefix": "prd"
+    }
   }
 }

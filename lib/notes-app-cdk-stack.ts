@@ -1,6 +1,8 @@
 import * as cdk from 'aws-cdk-lib';
+import { Port } from 'aws-cdk-lib/aws-ec2';
 import { Construct } from 'constructs';
 import { getConfig } from '../build-config';
+import { Container } from '../src/container';
 import { Database } from '../src/rds';
 import { VpcNetwork } from '../src/vpc';
 // import * as sqs from 'aws-cdk-lib/aws-sqs';
@@ -25,6 +27,13 @@ export class NotesAppCdkStack extends cdk.Stack {
       dbuser: "notes_user",
       instanceIdentifier: 'postgresql-01',
     });
+
+    const containerCluster = new Container(this, "Container", {
+      rds: database,
+      vpc: vpc.vpc,
+    })
+
+    database.databaseInstance.connections.allowFrom(containerCluster.service.service, Port.tcp(5432), "Allow connections from fargate");
 
   }
 }

@@ -16,6 +16,7 @@ export interface IDatabaseInstanceProps {
 export class Database extends Construct {
   vpc: IVpc;
   databaseInstance: IDatabaseInstance;
+  databaseCredentials: DatabaseSecret;
 
   constructor(scope: Construct, id: string, props: IDatabaseInstanceProps) {
     super(scope, id);
@@ -26,6 +27,7 @@ export class Database extends Construct {
       secretName: credsSecretName,
       username: props.dbuser
     })
+    this.databaseCredentials = creds;
 
     this.vpc = props.vpc;
     this.databaseInstance = new DatabaseInstance(this, "PostgresInstance", {
